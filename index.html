@@ -89,16 +89,16 @@
 
 			.sheet {
 				opacity: 0.98;
-				width: 80%;
-				height: 80%;
+				width: 90%;
+				height: 90%;
 				display: block;
 				position: absolute;
 				box-shadow: 0px 15px 60px rgba(0,0,0,0.3);
-				top: 10%;
-				left: 10%;
+				top: 5%;
+				left: 5%;
 				background: #fff;
 				z-index: 100;
-				overflow: hidden;
+				overflow: scroll;
 				transition: all 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
 			}
 
@@ -114,8 +114,26 @@
 				color: #333;
 			}
 
-			#wunderlist a {
-				color: #d94d44;
+			#wunderlist a { color: #d94d44; }
+			#knightlyrage a { color: #a9a6ac; }
+			#stickynotes a { color: #f5c54c; }
+			#photography a { color: #456d5f; }
+			#illustrations a { color: #fc7f51; }
+			#secret a { color: #000; }
+
+			.gallery-parent {
+				margin-top: 26px;
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: row;
+				align-content: stretch;
+				height: 100%;
+				justify-content: space-evenly;
+			}
+
+			.gallery-parent img {
+				height: 100%;
+				margin:10px;
 			}
 
 			.sub-heading {
@@ -152,6 +170,16 @@
 			let container, camera, scene, renderer, effect, raycaster, ring, canvas;
 			let spheres = [];
 			let rotations = [];
+			// for tooltip
+			let tooltip, texture, tooltipContext, sprite;
+			tooltip = document.createElement('canvas');
+			tooltipContext = tooltip.getContext('2d');
+			tooltipContext.fillStyle = '#FF0000';
+			tooltipContext.font = "Bold 20px Arial";
+			tooltipContext.fillStyle = "rgba(0,0,0,0.95)";
+			tooltipContext.fillText('Adam here!', 0, 20);
+			texture = new THREE.Texture(tooltip); 
+			texture.needsUpdate = true;	
 
 			let mouse = new THREE.Vector2(), INTERSECTED;
 
@@ -185,32 +213,38 @@
 					{	
 						'project': 'wunderlist',
 						'material': new THREE.MeshStandardMaterial( {  emissive: 0xd94d44 } ),
-						'scale': Math.random() * 5 + 1
+						'scale': Math.random() * 5 + 1,
+						'displayName': 'Wunderlist'
 					},
 					{
 						'project': 'stickynotes',
 						'material': new THREE.MeshStandardMaterial( {  emissive: 0xf5c54c } ),
-						'scale': Math.random() * 4 + 1
+						'scale': Math.random() * 4 + 1,
+						'displayName': 'Microsoft'
 					},
 					{
 						'project': 'secret',
 						'material': new THREE.MeshStandardMaterial( {  emissive: 0x000000 } ),
-						'scale': Math.random() * 2 + 1
+						'scale': Math.random() * 2 + 1,
+						'displayName': 'Secret'
 					},
 					{
 						'project': 'photography',
 						'material': new THREE.MeshStandardMaterial( {  emissive: 0x456d5f } ),
-						'scale': Math.random() * 3 + 1
+						'scale': Math.random() * 3 + 1,
+						'displayName': 'Photography'
 					},
 					{
 						'project': 'illustrations',
 						'material': new THREE.MeshStandardMaterial( {  emissive: 0xfc7f51 } ),
-						'scale': Math.random() * 2 + 1
+						'scale': Math.random() * 2 + 1,
+						'displayName': 'Illustrations'
 					}, 
 					{
 						'project': 'knightlyrage',
 						'material': new THREE.MeshStandardMaterial( {  emissive: 0xa9a6ac } ),
-						'scale': Math.random() * 3 + 1
+						'scale': Math.random() * 3 + 1,
+						'displayName': 'Game Dev'
 					}
 				];
 
@@ -223,6 +257,7 @@
 					mesh.position.y = Math.random() * 10;
 					mesh.position.z = Math.random() * 10;
 					mesh.callback = orbClick;
+					mesh.name = projects[i].displayName;
 					mesh.projectTitle = projects[i].project;
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = projects[i].scale;
@@ -257,10 +292,18 @@
 				ring.scale.set(0.01,0.1,0.1);
 
 				ring.title = 'cursor';
+
+				// for tooltip
+				let spriteMaterial = new THREE.SpriteMaterial( { map: texture, color: 0x000000 });
+				sprite = new THREE.Sprite( spriteMaterial );
+				sprite.scale.set(200,100,1.0);
+				sprite.position.set( 0, 0, 0 );
+				scene.add( sprite );
+				//
+				
 				scene.add( ring );
 				scene.add( directionalLight );
 				canvas = document.body.getElementsByTagName('canvas')[0];
-				
 			}
 
 			function onWindowResize() {
@@ -277,6 +320,8 @@
 
 			function onDocumentMouseMove( e ) {
 				e.preventDefault();
+
+				sprite.position.set( e.clientX, e.clientY - 20, 0 );
 
 				//for parallax 
 				mouseX = ( e.clientX - windowHalfX ) / 100;
@@ -388,16 +433,40 @@
 
 				raycaster.setFromCamera( mouse, camera );
 				var intersects = raycaster.intersectObjects( scene.children );
+				// has intersection
 				if ( intersects.length > 0 ) {
+					// has not been intersected again, and is unique
 					if ( INTERSECTED != intersects[ 0 ].object && intersects[ 0 ].object.title !== 'cursor') {
-						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+						// not changed color
+						// if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						// INTERSECTED.material.emissive.setHex( 0xff0000 );
+						// INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+
+						// for tooltip
+						if ( intersects[ 0 ].object.name ) {
+							tooltipContext.clearRect(0,0,640,480);
+							var message = intersects[ 0 ].object.name;
+							var metrics = tooltipContext.measureText(message);
+							var width = metrics.width;
+							tooltipContext.fillStyle = "rgba(0,0,0,0.95)"; // black border
+							tooltipContext.fillRect( 0,0, width+8,20+8);
+							tooltipContext.fillStyle = "rgba(255,255,255,0.95)"; // white filler
+							tooltipContext.fillRect( 2,2, width+4,20+4 );
+							tooltipContext.fillStyle = "rgba(0,0,0,1)"; // text color
+							tooltipContext.fillText( message, 4,20 );
+							texture.needsUpdate = true;
+						}
+						else
+						{
+							tooltipContext.clearRect(0,0,300,300);
+							texture.needsUpdate = true;
+						}
 					}
 				} else {
-					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+					// if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 					INTERSECTED = null;
+					tooltipContext.clearRect(0,0,300,300);
+					texture.needsUpdate = true;
 					resetCursor()
 				}
 				
@@ -428,12 +497,22 @@
 				<div class="sub-heading">At 6Wunderkinder, I worked as a UX Engineer—building front-end experiences for native applications and the web. From the early days of <a href="https://thenextweb.com/insider/2012/09/06/project-management-app-wunderkit-to-cease-further-development/">Wunderkit</a>, to the <a href="https://www.wunderlist.com/blog/thanks-for-making-wunderlist-app-of-the-year-2013/">critically acclaimed Wunderlist</a>, I've worked with world class developers and designers to build software that people <a href="https://www.appannie.com/en/apps/ios/app/406644151/">love</a>. 
 				</div>
 			</div>
+			<div class="gallery-parent">
+				<img src="images/wunderlist/2.png"/>
+				<img src="images/wunderlist/1.png"/>
+			</div>
 		</div> 
 
 		<div class="sheet closed" id="knightlyrage">
 			<div class="sheet-container">
 				<div class="title">Knightly Rage</div><div class="close">&#x2715;</div>
-				<div class="sub-heading">I once built a game, it was a fun project. From the hand-made animations and the painted backgrounds to the code that powers it, I learned a lot from this tiny, single-button game. Give it a <a href="https://play.google.com/store/apps/details?id=com.knightlyRage.KnightlyRage">go</a>—be warned, it's a hard game.  
+				<div class="sub-heading">I once built a game, it was a fun project. From the hand-made animations and the painted backgrounds to the code that powers it, I learned a lot from this tiny, single-button game. <a href="https://play.google.com/store/apps/details?id=com.knightlyRage.KnightlyRage">Give it a go</a>—be warned, it's a hard game.  
+				</div>
+
+				<div class="gallery-parent">
+					<img src="images/knightlyrage/1.jpg"/>
+					<img src="images/knightlyrage/2.jpg"/>
+					<img src="images/knightlyrage/3.jpg"/>
 				</div>
 			</div>
 		</div> 
