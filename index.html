@@ -4,7 +4,7 @@
 		<title>Adam Schroder »» Designer in Berlin</title>
 		<meta charset="utf-8">
 		<link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:200,400" rel="stylesheet">		
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
@@ -70,23 +70,67 @@
 				z-index:1000;
 			}
 
-			a {
-				color: #ffffff;
+			.sheet.closed {
+				opacity: 0;
+				z-index: -1;
+				transform: translateY(-100px);		
+			}
+
+			.close {
+				display: block;
+				right: 20px;
+				top: 20px;
+				position: absolute;
+				font-size: 30px;
+				color: #8c8c8c;
+				padding: 10px;
+				cursor: pointer;
+			}
+
+			.sheet {
+				opacity: 0.98;
+				width: 80%;
+				height: 80%;
+				display: block;
+				position: absolute;
+				box-shadow: 0px 15px 60px rgba(0,0,0,0.3);
+				top: 10%;
+				left: 10%;
+				background: #fff;
+				z-index: 100;
+				overflow: hidden;
+				transition: all 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+			}
+
+			.sheet-container {
+				margin: 80px;
 			}
 
 			.title {
+				display: block;
 				font-family: Arial,sans-serif;
-				font-size: 14px;
+				font-size: 45px;
 				line-height: 20px;
 				color: #333;
 			}
 
+			#wunderlist a {
+				color: #d94d44;
+			}
+
 			.sub-heading {
+				display: block;
 				font-family: 'IBM Plex Sans', sans-serif;
 				color: #888;
 				font-size: 26px;
+				margin-top: 26px;
 				line-height: 40px;
 				font-weight: 200;
+			}
+
+			.lock {
+				font-family: "Times", "Times New Roman", "serif", "sans-serif", "EmojiSymbols";
+				color:#000;
 			}
 
 			#webglmessage a { color:#da0 }
@@ -216,6 +260,7 @@
 				scene.add( ring );
 				scene.add( directionalLight );
 				canvas = document.body.getElementsByTagName('canvas')[0];
+				
 			}
 
 			function onWindowResize() {
@@ -279,7 +324,17 @@
 			}
 
 			function orbClick(obj) {
-				console.log(obj)
+				const title = obj.object.projectTitle;
+				const sheet = document.getElementById(title);
+				sheet.classList.remove('closed');
+			}
+
+			function closeProject(e) {
+				e.preventDefault();
+				const openProjects = document.getElementsByClassName('sheet');
+				for (var i=0;i<openProjects.length;i++){
+					openProjects[i].classList.add('closed');
+				}
 			}
 
 			function resetCursor() {
@@ -367,9 +422,59 @@
 			document.addEventListener('mousedown', onMouseDown, false);
 		</script>
 
-
 		<div class="sheet closed" id="wunderlist">
-
+			<div class="sheet-container">
+				<div class="title">Wunderlist</div><div class="close">&#x2715;</div>
+				<div class="sub-heading">At 6Wunderkinder, I worked as a UX Engineer—building front-end experiences for native applications and the web. From the early days of <a href="https://thenextweb.com/insider/2012/09/06/project-management-app-wunderkit-to-cease-further-development/">Wunderkit</a>, to the <a href="https://www.wunderlist.com/blog/thanks-for-making-wunderlist-app-of-the-year-2013/">critically acclaimed Wunderlist</a>, I've worked with world class developers and designers to build software that people <a href="https://www.appannie.com/en/apps/ios/app/406644151/">love</a>. 
+				</div>
+			</div>
 		</div> 
+
+		<div class="sheet closed" id="knightlyrage">
+			<div class="sheet-container">
+				<div class="title">Knightly Rage</div><div class="close">&#x2715;</div>
+				<div class="sub-heading">I once built a game, it was a fun project. From the hand-made animations and the painted backgrounds to the code that powers it, I learned a lot from this tiny, single-button game. Give it a <a href="https://play.google.com/store/apps/details?id=com.knightlyRage.KnightlyRage">go</a>—be warned, it's a hard game.  
+				</div>
+			</div>
+		</div> 
+
+		<div class="sheet closed" id="stickynotes">
+			<div class="sheet-container">
+				<div class="title">Sticky Notes</div><div class="close">&#x2715;</div>
+				<div class="sub-heading">At Microsoft, our small team set out to create a note taking application that could meet or exceed the power of physical Sticky Notes. On this team, I designed interfaces and systems for a cross-platform experience that millions of people use today. For <a href="https://www.microsoft.com/en-us/p/microsoft-sticky-notes/9nblggh4qghw">Windows</a>, <a href="https://itunes.apple.com/ie/app/microsoft-onenote/id410395246?mt=8">iOS</a> & <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.onenote&">Android</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="sheet closed" id="photography">
+			<div class="sheet-container">
+				<div class="title">Photography</div><div class="close">&#x2715;</div>
+				<div class="sub-heading">Sometimes I take photos, here are some favorites. 
+				</div>
+			</div>
+		</div>
+
+		<div class="sheet closed" id="illustrations">
+			<div class="sheet-container">
+				<div class="title">Illustrations</div><div class="close">&#x2715;</div>
+				<div class="sub-heading">I like to illustrate for fun, I think these turned out best. 
+				</div>
+			</div>
+		</div>
+
+		<div class="sheet closed" id="secret">
+			<div class="sheet-container">
+				<div class="title"><span class="lock">🔒</span> Secret</div><div class="close">&#x2715;</div>
+				<div class="sub-heading">I worked for a contracting firm building computer-based training software for some government agencies. The nature of this work is confidential, but I can tell you that this period in my life taught me a lot about working with delicate constraints & what it's like to work with a large company.
+				</div>
+			</div>
+		</div>
 	</body>
+
+	<script>
+		const closeButtons = document.getElementsByClassName('close');
+		for (var i=0;i<closeButtons.length;i++){
+			closeButtons[i].addEventListener('click', closeProject, false);
+		}
+	</script>
 </html>
