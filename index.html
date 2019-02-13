@@ -98,7 +98,8 @@
 				left: 5%;
 				background: #fff;
 				z-index: 100;
-				overflow: scroll;
+				overflow-y: scroll;
+				overflow-x: hidden; 
 				transition: all 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
 			}
 
@@ -132,8 +133,26 @@
 			}
 
 			.gallery-parent img {
+				width: 100%;
 				height: 100%;
-				margin:10px;
+				padding: 50px;
+				object-fit: contain;
+				margin:10px auto;
+				box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+				border-radius: 4px;
+				/* -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+				clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); */
+			}
+
+			#illustrations .gallery-parent img {
+				width: 20%;
+			}
+
+			#photography .gallery-parent img {
+				width: 50%;
+				padding: 50px;
+				border: 10px solid black;
+				margin: 50px auto;
 			}
 
 			.sub-heading {
@@ -144,6 +163,7 @@
 				margin-top: 26px;
 				line-height: 40px;
 				font-weight: 200;
+				width: 50%;
 			}
 
 			.lock {
@@ -190,7 +210,6 @@
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 			animate();
@@ -321,8 +340,6 @@
 			function onDocumentMouseMove( e ) {
 				e.preventDefault();
 
-				sprite.position.set( e.clientX, e.clientY - 20, 0 );
-
 				//for parallax 
 				mouseX = ( e.clientX - windowHalfX ) / 100;
 				mouseY = ( e.clientY - windowHalfY ) / 100;
@@ -335,22 +352,23 @@
 				mouse.y =  - (e.clientY / renderer.domElement.clientHeight) * 2 + 1;
 				
 				raycaster.setFromCamera(mouse, camera);
-		
 				var intersects = raycaster.intersectObjects(spheres);
 		
 				if (intersects.length > 0) {
 					canvas.style.cursor = "pointer";
+					sprite.position.copy(ring.position);
 				} 
 				else {
 					resetCursor();
 					// this code moves the cursor on a 2d plane
+
 					// var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
 					// vector.unproject( camera );
 					// var dir = vector.sub( camera.position ).normalize();
 
 					// var distance = - camera.position.z / dir.z;
 					// var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-					// ring.position.copy(pos);
+	
 					ring.rotation.copy(camera.rotation);
 				}
 			}
@@ -459,6 +477,7 @@
 						else
 						{
 							tooltipContext.clearRect(0,0,300,300);
+							resetCursor()
 							texture.needsUpdate = true;
 						}
 					}
@@ -488,6 +507,7 @@
 				}
 			}
 
+			document.addEventListener('mousemove', onDocumentMouseMove, false );
 			document.addEventListener('mousedown', onMouseDown, false);
 		</script>
 
@@ -520,7 +540,7 @@
 		<div class="sheet closed" id="stickynotes">
 			<div class="sheet-container">
 				<div class="title">Sticky Notes</div><div class="close">&#x2715;</div>
-				<div class="sub-heading">At Microsoft, our small team set out to create a note taking application that could meet or exceed the power of physical Sticky Notes. On this team, I designed interfaces and systems for a cross-platform experience that millions of people use today. For <a href="https://www.microsoft.com/en-us/p/microsoft-sticky-notes/9nblggh4qghw">Windows</a>, <a href="https://itunes.apple.com/ie/app/microsoft-onenote/id410395246?mt=8">iOS</a> & <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.onenote&">Android</a>
+				<div class="sub-heading">At Microsoft, our small team set out to create a note taking application that could meet or exceed the power of physical Sticky Notes. On this team, I designed interfaces and systems for a cross-platform experience that millions of people use today. Available for <a href="https://www.microsoft.com/en-us/p/microsoft-sticky-notes/9nblggh4qghw">Windows</a>, <a href="https://itunes.apple.com/ie/app/microsoft-onenote/id410395246?mt=8">iOS</a> & <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.onenote&">Android</a>
 				</div>
 			</div>
 		</div>
@@ -530,6 +550,19 @@
 				<div class="title">Photography</div><div class="close">&#x2715;</div>
 				<div class="sub-heading">Sometimes I take photos, here are some favorites. 
 				</div>
+				<div class="gallery-parent">
+					<img src="images/photography/1.jpg"/>
+					<img src="images/photography/2.jpg"/>
+					<img src="images/photography/3.jpg"/>
+					<img src="images/photography/4.jpg"/>
+					<img src="images/photography/5.jpg"/>
+					<img src="images/photography/6.jpg"/>
+					<img src="images/photography/7.jpg"/>
+					<img src="images/photography/8.jpg"/>
+					<img src="images/photography/9.jpg"/>
+					<img src="images/photography/10.jpg"/>
+					<img src="images/photography/11.jpg"/>
+				</div>
 			</div>
 		</div>
 
@@ -537,6 +570,16 @@
 			<div class="sheet-container">
 				<div class="title">Illustrations</div><div class="close">&#x2715;</div>
 				<div class="sub-heading">I like to illustrate for fun, I think these turned out best. 
+				</div>
+				<div class="gallery-parent">
+					<img src="images/illustrations/1.jpg"/>
+					<img src="images/illustrations/2.jpg"/>
+					<img src="images/illustrations/3.jpg"/>
+					<img src="images/illustrations/6.jpg"/>
+					<img src="images/illustrations/7.jpg"/>
+					<img src="images/illustrations/8.jpg"/>
+					<img src="images/illustrations/9.jpg"/>
+					<img src="images/illustrations/10.jpg"/>
 				</div>
 			</div>
 		</div>
