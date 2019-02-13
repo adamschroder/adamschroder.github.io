@@ -148,6 +148,10 @@
 				width: 20%;
 			}
 
+			#secret .gallery-parent img {
+				width: 110%;
+			}
+
 			#stickynotes .gallery-parent img {
 				width: 40%;
 			}
@@ -408,7 +412,7 @@
 				if (canvas) canvas.style.cursor = "default";
 			}
 
-			function easeInOut (t) {  return t<.5 ? 2*t*t : -1+(4-2*t)*t }
+			function easeInOut (t) {  return t<.1 ? 2*t*t : -1+(4-2*t)*t }
 
 			function handleCursor () {
 				const intersects = raycaster.intersectObjects( spheres );
@@ -420,9 +424,9 @@
 					const maxZ = (intersekt.scale.z + 2).toFixed(2);
 
 					if (ring.scale.x.toFixed(2) <= maxX && ring.scale.y.toFixed(2) <= maxY && ring.scale.z.toFixed(2) <= maxZ) {
-						ring.scale.x += easeInOut(0.4);
-						ring.scale.y += easeInOut(0.4);
-						ring.scale.z += easeInOut(0.4);
+						ring.scale.x += easeInOut(0.37);
+						ring.scale.y += easeInOut(0.37);
+						ring.scale.z += easeInOut(0.37);
 					}
 				
 					ring.scale.set(ring.scale.x, ring.scale.y, ring.scale.z);
