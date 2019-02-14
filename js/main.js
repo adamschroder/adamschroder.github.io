@@ -327,7 +327,7 @@ function openProfile () {
     orbClick();
 }
 
-var name = document.getElementById('name');
+var headerName = document.getElementById('name');
 document.addEventListener('mousemove', onDocumentMouseMove, false );
 document.addEventListener('mousedown', onMouseDown, false);
-name.addEventListener('click', openProfile, false);
+headerName.addEventListener('click', openProfile, false);
