@@ -2,9 +2,10 @@ if ( WEBGL.isWebGLAvailable() === false ) {
     document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 }
 
-var container, camera, scene, renderer, effect, raycaster, ring, canvas;
+var container, camera, scene, renderer, effect, raycaster, ring, canvas, opened;
 var spheres = [];
 var rotations = [];
+var opened = 0;
 var IS_OPEN = false;
 // for tooltip
 var tooltip, texture, tooltipContext, sprite;
@@ -42,44 +43,71 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xFAFAFA );
 
+    var ringGeometry = new THREE.RingGeometry( 0.3, 0.32, 6 );
+    var ringMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+    ring = new THREE.Mesh( ringGeometry, ringMaterial );
+    ring.scale.set(0.01,0.1,0.1);
+    ring.title = 'cursor';
+
     var geometry = new THREE.IcosahedronBufferGeometry(0.3, 0 );
     var material = new THREE.MeshStandardMaterial( {  emissive: 0x6284FF } );
+    var ringMaterials = [
+        new THREE.MeshBasicMaterial( { color: 0xd94d44, side: THREE.DoubleSide } ),
+        new THREE.MeshBasicMaterial( { color: 0xf5c54c, side: THREE.DoubleSide } ),
+        new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } ),
+        new THREE.MeshBasicMaterial( { color: 0x456d5f, side: THREE.DoubleSide } ),
+        new THREE.MeshBasicMaterial( { color: 0xfc7f51, side: THREE.DoubleSide } ),
+        new THREE.MeshBasicMaterial( { color: 0xa9a6ac, side: THREE.DoubleSide } ),
+    ]
+
     var projects = [
         {	
             'project': 'wunderlist',
             'material': new THREE.MeshStandardMaterial( {  emissive: 0xd94d44 } ),
             'scale': Math.random() * 5 + 1,
-            'displayName': 'Wunderlist'
+            'displayName': 'Wunderlist',
+            'visited': false,
+            'ringMesh': new THREE.Mesh(ringGeometry, ringMaterials[0])
         },
         {
             'project': 'stickynotes',
             'material': new THREE.MeshStandardMaterial( {  emissive: 0xf5c54c } ),
             'scale': Math.random() * 4 + 1,
-            'displayName': 'Microsoft'
+            'displayName': 'Microsoft',
+            'visited': false,
+            'ringMesh': new THREE.Mesh(ringGeometry, ringMaterials[1])
         },
         {
             'project': 'secret',
             'material': new THREE.MeshStandardMaterial( {  emissive: 0x000000 } ),
             'scale': Math.random() * 2 + 1,
-            'displayName': 'Secret'
+            'displayName': 'Secret',
+            'visited': false,
+            'ringMesh': new THREE.Mesh(ringGeometry, ringMaterials[2])
         },
         {
             'project': 'photography',
             'material': new THREE.MeshStandardMaterial( {  emissive: 0x456d5f } ),
             'scale': Math.random() * 3 + 1,
-            'displayName': 'Photography'
+            'displayName': 'Photography',
+            'visited': false,
+            'ringMesh': new THREE.Mesh(ringGeometry, ringMaterials[3])
         },
         {
             'project': 'illustrations',
             'material': new THREE.MeshStandardMaterial( {  emissive: 0xfc7f51 } ),
             'scale': Math.random() * 2 + 1,
-            'displayName': 'Illustrations'
+            'displayName': 'Illustrations',
+            'visited': false,
+            'ringMesh': new THREE.Mesh(ringGeometry, ringMaterials[4])
         }, 
         {
             'project': 'knightlyrage',
             'material': new THREE.MeshStandardMaterial( {  emissive: 0xa9a6ac } ),
             'scale': Math.random() * 3 + 1,
-            'displayName': 'Game Dev'
+            'displayName': 'Game Dev',
+            'visited': false,
+            'ringMesh': new THREE.Mesh(ringGeometry, ringMaterials[5])
         }
     ];
 
@@ -94,10 +122,13 @@ function init() {
         mesh.callback = orbClick;
         mesh.name = projects[i].displayName;
         mesh.projectTitle = projects[i].project;
+        mesh.ring = projects[i].ringMesh;
+        mesh.ring.title = 'cursor';
 
         mesh.scale.x = mesh.scale.y = mesh.scale.z = projects[i].scale;
-
+        mesh.ring.visible = false;
         scene.add( mesh );
+        scene.add( mesh.ring );
         spheres.push( mesh );
 
         rotations.push([getRandomArbitrary(0.001,0.01),getRandomArbitrary(0.00001,0.0001)]);
@@ -119,14 +150,6 @@ function init() {
     raycaster = new THREE.Raycaster();
 
     var directionalLight = new THREE.DirectionalLight( 0xcccccc, 0.1 );
-
-
-    var ringGeometry = new THREE.RingGeometry( 0.3, 0.32, 6 );
-    var ringMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
-    ring = new THREE.Mesh( ringGeometry, ringMaterial );
-    ring.scale.set(0.01,0.1,0.1);
-
-    ring.title = 'cursor';
 
     // for tooltip
     var spriteMaterial = new THREE.SpriteMaterial( { map: texture, color: 0x000000 });
@@ -202,6 +225,12 @@ function orbClick(obj) {
     var title = obj !== undefined ? obj.object.projectTitle: 'profile';
     var sheet = document.getElementById(title);
     sheet.classList.remove('closed');
+    if (title !== 'profile') {
+        window.setTimeout(function() {
+            obj.object.visited = true;
+            opened++;
+        }, 500);
+    }
 }
 
 function closeProject(e) {
@@ -211,6 +240,13 @@ function closeProject(e) {
     var openProjects = document.getElementsByClassName('sheet');
     for (var i=0;i<openProjects.length;i++){
         openProjects[i].classList.add('closed');
+    }
+
+    if (opened === 6) {
+        window.setTimeout(function() {
+            var topMark = document.getElementById('logomark');
+            topMark.classList.add('open');
+        }, 400);
     }
 }
 
@@ -223,7 +259,7 @@ function easeInOut (t) {  return t<.1 ? 2*t*t : -1+(4-2*t)*t }
 
 function handleCursor () {
     var intersects = raycaster.intersectObjects( spheres );
-    if ( intersects.length > 0 ) {
+    if ( intersects.length > 0) {
         var intersekt = intersects[0].object;
 
         var maxX = (intersekt.scale.x + 2).toFixed(2);
@@ -246,13 +282,12 @@ function handleCursor () {
     }
 }
 
+
 function render() {
 
     var timer = 0.0001 * Date.now();
-
     camera.position.x += ( mouseX - camera.position.x ) * .05;
     camera.position.y += ( mouseY - camera.position.y ) * .05;
-    var hover;
     camera.lookAt( scene.position );
 
     for ( var i = 0, il = spheres.length; i < il; i ++ ) {
@@ -263,6 +298,16 @@ function render() {
         sphere.position.y = 5 * Math.sin( timer + i * 1.1 );
         sphere.rotation.x += rotations[i][0];
         sphere.rotation.y += rotations[i][1];
+        if (sphere.visited) {
+            sphere.ring.visible = true;
+            sphere.ring.scale.set(sphere.scale.x + 0.5, sphere.scale.y + 0.5, sphere.scale.z + 0.5);
+            sphere.ring.position.x = sphere.position.x;
+            sphere.ring.position.y = sphere.position.y;
+            sphere.ring.position.z = sphere.position.z;
+            sphere.ring.rotation.x += 0.005;
+            sphere.ring.rotation.y += 0.005;
+            sphere.ring.rotation.z += 0.005;
+        }
     }
 
     raycaster.setFromCamera( mouse, camera );
@@ -298,7 +343,6 @@ function render() {
             }
         }
     } else {
-        // if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
         INTERSECTED = null;
         tooltipContext.clearRect(0,0,300,300);
         texture.needsUpdate = true;
@@ -319,7 +363,8 @@ function onMouseDown (e) {
     var intersects = raycaster.intersectObjects(spheres);
 
     if (intersects.length > 0) {
-        intersects[0].object.callback(intersects[0]);
+        var object = intersects[0].object;
+        object.callback(intersects[0]);
     }
 }
 

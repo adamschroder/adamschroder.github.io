@@ -51,6 +51,10 @@ h1 {
     cursor:pointer;
 }
 
+.top-mark.open .name {
+    width: 84px;
+}
+
 .top-mark:hover .name {
     width: 84px;
 }
